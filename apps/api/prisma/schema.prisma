@@ -1,0 +1,221 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PACKED
+  SHIPPED
+  DONE
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String?  // null kalau daftar lewat Google
+  googleId     String?  @unique
+  avatarUrl    String?
+  role         Role     @default(BUYER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  store     Store?
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+  reviews   Review[]
+}
+
+model Store {
+  id           String      @id @default(uuid())
+  ownerId      String      @unique
+  name         String
+  slug         String      @unique
+  description  String?
+  city         String
+  status       StoreStatus @default(PENDING)
+  rejectReason String?
+  approvedAt   DateTime?
+  createdAt    DateTime    @default(now())
+
+  owner     User       @relation(fields: [ownerId], references: [id])
+  products  Product[]
+  subOrders SubOrder[]
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  storeId     String
+  categoryId  String
+  name        String
+  slug        String   @unique
+  description String?
+  price       Int      // rupiah, tanpa desimal
+  unit        String   // "kg", "liter", "pcs"
+  stock       Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  store      Store       @relation(fields: [storeId], references: [id])
+  category   Category    @relation(fields: [categoryId], references: [id])
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([storeId])
+  @@index([categoryId])
+}
+
+model Address {
+  id          String  @id @default(uuid())
+  userId      String
+  label       String  // "Rumah", "Kantor"
+  recipient   String
+  phone       String
+  street      String
+  city        String
+  province    String
+  postalCode  String
+  isDefault   Boolean @default(false)
+
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[]
+
+  @@index([userId])
+}
+
+model Cart {
+  id     String     @id @default(uuid())
+  userId String     @unique
+  user   User       @relation(fields: [userId], references: [id])
+  items  CartItem[]
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  cartId    String
+  productId String
+  quantity  Int
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+}
+
+// 1 checkout pembeli = 1 Order, dipecah jadi SubOrder per toko
+model Order {
+  id          String      @id @default(uuid())
+  code        String      @unique // contoh: TSR-20260921-0001
+  buyerId     String
+  addressId   String
+  totalAmount Int
+  status      OrderStatus @default(PENDING_PAYMENT)
+  createdAt   DateTime    @default(now())
+
+  buyer     User       @relation(fields: [buyerId], references: [id])
+  address   Address    @relation(fields: [addressId], references: [id])
+  subOrders SubOrder[]
+  payment   Payment?
+
+  @@index([buyerId])
+}
+
+model SubOrder {
+  id       String      @id @default(uuid())
+  orderId  String
+  storeId  String
+  subtotal Int
+  status   OrderStatus @default(PENDING_PAYMENT)
+
+  order Order       @relation(fields: [orderId], references: [id])
+  store Store       @relation(fields: [storeId], references: [id])
+  items OrderItem[]
+
+  @@index([storeId])
+}
+
+model OrderItem {
+  id          String @id @default(uuid())
+  subOrderId  String
+  productId   String
+  productName String // snapshot, biar histori tidak berubah kalau produk diedit
+  price       Int    // snapshot harga saat beli
+  quantity    Int
+
+  subOrder SubOrder @relation(fields: [subOrderId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique
+  gatewayOrderId  String        @unique // order_id yang dikirim ke Midtrans
+  amount          Int
+  method          String?
+  status          PaymentStatus @default(PENDING)
+  rawPayload      Json?         // simpan notifikasi webhook untuk audit
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  rating    Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}

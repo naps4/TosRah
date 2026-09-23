@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+
+  /* hijau daun */
+  --color-leaf-50: #eef7f1;
+  --color-leaf-100: #d6ebdd;
+  --color-leaf-200: #aed7bc;
+  --color-leaf-300: #7dbb95;
+  --color-leaf-400: #4e9c6e;
+  --color-leaf-500: #2f7d4f;
+  --color-leaf-600: #256540;
+  --color-leaf-700: #1e5033;
+  --color-leaf-800: #183f29;
+  --color-leaf-900: #123020;
+
+  /* kuning padi */
+  --color-grain-100: #feecbf;
+  --color-grain-300: #f8c55a;
+  --color-grain-400: #f2b134;
+  --color-grain-500: #d99a1c;
+
+  /* netral hangat */
+  --color-cream: #fbf7ee;
+  --color-cream-dark: #f1eadb;
+  --color-ink: #1f2a24;
+  --color-ink-soft: #55645b;
+
+  /* peringatan / stok tipis */
+  --color-chili: #d64545;
+}
