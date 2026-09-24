@@ -17,3 +17,21 @@ export type Paginated<T> = {
   items: T[];
   meta: { total: number; page: number; limit: number; totalPages: number };
 };
+
+export type CartItem = {
+  id: string;
+  quantity: number;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    unit: string;
+    stock: number;
+    imageUrl: string | null;
+    isActive: boolean;
+    store: { id: string; name: string };
+  };
+};
+
+export type Cart = { id: string; items: CartItem[] };

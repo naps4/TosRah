@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -65,6 +66,7 @@ export class ProductsService {
   async create(userId: string, dto: CreateProductDto) {
     const storeId = await this.getActiveStoreId(userId);
     await this.ensureCategory(dto.categoryId);
+    await this.ensureNameNotTaken(storeId, dto.name);
     return this.prisma.product.create({
       data: { ...dto, storeId, slug: uniqueSlug(dto.name) },
     });
@@ -83,6 +85,7 @@ export class ProductsService {
     const storeId = await this.getActiveStoreId(userId);
     await this.getOwnedProductOrThrow(id, storeId);
     if (dto.categoryId) await this.ensureCategory(dto.categoryId);
+    if (dto.name) await this.ensureNameNotTaken(storeId, dto.name, id);
     return this.prisma.product.update({ where: { id }, data: dto });
   }
 
@@ -122,5 +125,24 @@ export class ProductsService {
       where: { id: categoryId },
     });
     if (!category) throw new BadRequestException('Kategori tidak ditemukan');
+  }
+    private async ensureNameNotTaken(
+    storeId: string,
+    name: string,
+    excludeId?: string,
+  ) {
+    const existing = await this.prisma.product.findFirst({
+      where: {
+        storeId,
+        isActive: true,
+        name: { equals: name.trim(), mode: 'insensitive' },
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Kamu sudah punya produk bernama "${name}". Edit produk itu saja, tidak perlu bikin baru.`,
+      );
+    }
   }
 }
