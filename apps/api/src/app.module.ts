@@ -9,6 +9,9 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductModel } from './generated/prisma/models';
 import { ProductsModule } from './products/products.module';
 import { CartModule } from './cart/cart.module';
+import { AddressesModule } from './addresses/addresses.module';
+import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [ConfigModule.forRoot({isGlobal:true}), 
@@ -18,6 +21,9 @@ import { CartModule } from './cart/cart.module';
     CategoriesModule,
     ProductsModule,
     CartModule,
+    AddressesModule,
+    OrdersModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
