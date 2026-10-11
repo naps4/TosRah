@@ -1,5 +1,7 @@
 import {
+  BadGatewayException,
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -7,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { MIDTRANS_SNAP } from '../payments/midtrans.provider';
+import { createHash } from 'crypto';
 
 type SnapClient = {
   createTransaction: (payload: unknown) => Promise<{
@@ -103,10 +106,15 @@ export class OrdersService {
               quantity: item.quantity,
             },
           });
-          await tx.product.update({
-            where: { id: item.productId },
+          const res = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
+          if (res.count === 0) {
+            throw new BadRequestException(
+              `Stok "${item.product.name}" tidak mencukupi`,
+            );
+          }
         }
       }
 
@@ -119,8 +127,10 @@ export class OrdersService {
       where: { id: userId },
     });
 
-    const snapResponse = await this.snap.createTransaction({
-      transaction_details: {
+    let snapResponse: Awaited<ReturnType<SnapClient['createTransaction']>>;
+    try {
+      snapResponse = await this.snap.createTransaction({
+        transaction_details: {
         order_id: orderCode,
         gross_amount: totalAmount,
       },
@@ -132,8 +142,14 @@ export class OrdersService {
       callbacks: {
         finish: `${this.config.get('WEB_URL') ?? 'http://localhost:5173'}/pesanan/${order.id}`,
       },
-    });
-
+      });
+    } catch {
+      await this.cancelAndRestock(order.id);
+      throw new BadGatewayException(
+        'Gagal membuat transaksi pembayaran, coba lagi',
+      );
+    }
+      
     await this.prisma.payment.create({
       data: {
         orderId: order.id,
@@ -173,13 +189,27 @@ export class OrdersService {
   async handlePaymentNotification(payload: {
     order_id: string;
     transaction_status: string;
+    status_code: string;
+    gross_amount: string;
+    signature_key: string;
     fraud_status?: string;
     payment_type?: string;
   }) {
+    const expected = createHash('sha512')
+      .update(
+        `${payload.order_id}${payload.status_code}${payload.gross_amount}${this.config.getOrThrow<string>('MIDTRANS_SERVER_KEY')}`,
+      )
+      .digest('hex');
+    if (expected !== payload.signature_key) {
+      throw new ForbiddenException('Signature tidak valid');
+    }
+
     const payment = await this.prisma.payment.findUnique({
       where: { gatewayOrderId: payload.order_id },
     });
     if (!payment) return; // notifikasi tidak dikenal, abaikan
+    if (payment.status !== 'PENDING') return; // sudah diproses, abaikan duplikat
+    if (Number(payload.gross_amount) !== payment.amount) return;
 
     const isSuccess =
       payload.transaction_status === 'settlement' ||
@@ -221,6 +251,28 @@ export class OrdersService {
             data: { stock: { increment: item.quantity } },
           });
         }
+      }
+    });
+  }
+
+    private async cancelAndRestock(orderId: string) {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: 'CANCELLED' },
+      });
+      await tx.subOrder.updateMany({
+        where: { orderId },
+        data: { status: 'CANCELLED' },
+      });
+      const items = await tx.orderItem.findMany({
+        where: { subOrder: { orderId } },
+      });
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
       }
     });
   }
