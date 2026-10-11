@@ -16,6 +16,9 @@ type SnapClient = {
     token: string;
     redirect_url: string;
   }>;
+  transaction: {
+    status: (orderId: string) => Promise<Record<string, string>>;
+  };
 };
 
 const orderInclude = {
@@ -175,12 +178,26 @@ export class OrdersService {
   }
 
   async findOne(userId: string, id: string) {
-    const order = await this.prisma.order.findUnique({
+    let order = await this.prisma.order.findUnique({
       where: { id },
       include: orderInclude,
     });
     if (!order || order.buyerId !== userId) {
       throw new NotFoundException('Pesanan tidak ditemukan');
+    }
+
+    // cadangan kalau webhook belum masuk: tanya langsung status ke Midtrans
+    if (order.payment?.status === 'PENDING') {
+      try {
+        const status = await this.snap.transaction.status(order.code);
+        await this.handlePaymentNotification(status as never);
+        order = await this.prisma.order.findUniqueOrThrow({
+          where: { id },
+          include: orderInclude,
+        });
+      } catch {
+        // transaksi belum ada di Midtrans atau gagal dicek, abaikan
+      }
     }
     return order;
   }

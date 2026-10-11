@@ -1,9 +1,11 @@
 import { createPortal } from 'react-dom';
 import { useCart } from '../lib/cart-context';
 import { formatRupiah } from '../lib/format';
+import { useNavigate } from 'react-router';
 
 export function CartDrawer({ onClose }: { onClose: () => void }) {
   const { cart, updateItem, removeItem } = useCart();
+  const navigate = useNavigate();
   const items = cart?.items ?? [];
   const total = items.reduce((sum, i) => sum + i.quantity * i.product.price, 0);
 
@@ -84,7 +86,13 @@ export function CartDrawer({ onClose }: { onClose: () => void }) {
               <span className="text-ink-soft">Total</span>
               <span className="font-semibold">{formatRupiah(total)}</span>
             </div>
-            <button className="mt-3 w-full rounded-full bg-leaf-600 py-3 text-sm font-semibold text-white hover:bg-leaf-700">
+            <button
+              onClick={() => {
+                onClose();
+                navigate('/checkout');
+              }}
+              className="mt-3 w-full rounded-full bg-leaf-600 py-3 text-sm font-semibold text-white hover:bg-leaf-700"
+            >
               Checkout
             </button>
           </div>

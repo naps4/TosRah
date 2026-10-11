@@ -10,6 +10,8 @@ import { AuthProvider } from './lib/auth-context';
 import { HomePage } from './pages/HomePage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartProvider } from './lib/cart-context.tsx';
+import { CheckoutPage } from './pages/CheckoutPage.tsx';
+import { OrderDetailPage } from './pages/OrderDetailPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'produk/:slug', element: <ProductDetailPage /> },
+      { path: 'checkout', element: <CheckoutPage /> },
+      { path: 'pesanan/:id', element: <OrderDetailPage /> },
     ],
   },
 ]);

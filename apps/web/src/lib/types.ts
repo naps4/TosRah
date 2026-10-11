@@ -35,3 +35,31 @@ export type CartItem = {
 };
 
 export type Cart = { id: string; items: CartItem[] };
+
+export type Address = {
+  id: string;
+  label: string;
+  recipient: string;
+  phone: string;
+  street: string;
+  city: string;
+  province: string;
+  postalCode: string;
+};
+
+export type Order = {
+  id: string;
+  code: string;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  address: Address;
+  payment: { status: string; method: string | null } | null;
+  subOrders: {
+    id: string;
+    subtotal: number;
+    status: string;
+    store: { id: string; name: string };
+    items: { id: string; productName: string; price: number; quantity: number }[];
+  }[];
+};
