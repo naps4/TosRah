@@ -12,6 +12,7 @@ import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartProvider } from './lib/cart-context.tsx';
 import { CheckoutPage } from './pages/CheckoutPage.tsx';
 import { OrderDetailPage } from './pages/OrderDetailPage.tsx';
+import { OrdersPage } from './pages/OrdersPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
       { path: 'produk/:slug', element: <ProductDetailPage /> },
       { path: 'checkout', element: <CheckoutPage /> },
       { path: 'pesanan/:id', element: <OrderDetailPage /> },
+      { path: 'pesanan', element: <OrdersPage /> },
     ],
   },
 ]);

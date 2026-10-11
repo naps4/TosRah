@@ -3,6 +3,7 @@ import { useAuth } from '../lib/auth-context';
 import { useCart } from '../lib/cart-context';
 import { AuthModal } from './AuthModal';
 import { CartDrawer } from './CartDrawer';
+import { Link } from 'react-router';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -51,6 +52,12 @@ export function Header() {
               <span className="text-ink-soft">
                 Hai, <span className="font-medium text-ink">{user.name}</span>
               </span>
+              <Link
+                to="/pesanan"
+                className="rounded-full px-4 py-2 font-medium text-leaf-700 hover:bg-leaf-50"
+              >
+                Pesanan
+              </Link>
               <button
                 onClick={logout}
                 className="rounded-full px-4 py-2 font-medium text-leaf-700 hover:bg-leaf-50"

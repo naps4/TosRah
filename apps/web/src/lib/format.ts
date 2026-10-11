@@ -16,3 +16,10 @@ const statusLabels: Record<string, string> = {
 };
 
 export const statusLabel = (s: string) => statusLabels[s] ?? s;
+
+export const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
