@@ -4,3 +4,7 @@ dist
 apps/web/dist
 *.tsbuildinfo
 rencana Strukur folder.txt
+   apps/api/.agents
+   apps/api/.claude
+   apps/api/.windsurf
+   apps/api/skills-lock.json
