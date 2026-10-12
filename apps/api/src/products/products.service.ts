@@ -42,12 +42,15 @@ export class ProductsService {
           }
         : {}),
     };
+
     const orderBy: Prisma.ProductOrderByWithRelationInput =
       sort === 'price_asc'
         ? { price: 'asc' }
         : sort === 'price_desc'
           ? { price: 'desc' }
-          : { createdAt: 'desc' };
+          : sort === 'best_selling'
+            ? { soldCount: 'desc' }
+            : { createdAt: 'desc' };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({

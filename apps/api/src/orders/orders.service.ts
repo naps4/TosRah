@@ -257,6 +257,19 @@ export class OrdersService {
         data: { status: isSuccess ? 'PAID' : 'CANCELLED' },
       });
 
+            // pembayaran sukses: tambah jumlah terjual
+      if (isSuccess) {
+        const paidItems = await tx.orderItem.findMany({
+          where: { subOrder: { orderId: payment.orderId } },
+        });
+        for (const item of paidItems) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { soldCount: { increment: item.quantity } },
+          });
+        }
+      }
+
       // kalau gagal/expired, kembalikan stok
       if (isFailed) {
         const items = await tx.orderItem.findMany({

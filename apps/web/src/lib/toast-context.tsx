@@ -6,8 +6,17 @@ import {
   type ReactNode,
 } from 'react';
 
-type Toast = { id: number; message: string; type: 'success' | 'error' };
-type ToastFn = (message: string, type?: Toast['type']) => void;
+type Toast = {
+  id: number;
+  message: string;
+  type: 'success' | 'error';
+  action?: { label: string; onClick: () => void };
+};
+type ToastFn = (
+  message: string,
+  type?: Toast['type'],
+  action?: Toast['action'],
+) => void;
 
 const ToastContext = createContext<ToastFn | null>(null);
 let nextId = 1;
@@ -15,10 +24,13 @@ let nextId = 1;
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const toast = useCallback<ToastFn>((message, type = 'success') => {
+  const toast = useCallback<ToastFn>((message, type = 'success', action) => {
     const id = nextId++;
-    setToasts((t) => [...t, { id, message, type }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 2800);
+    setToasts((t) => [...t, { id, message, type, action }]);
+    setTimeout(
+      () => setToasts((t) => t.filter((x) => x.id !== id)),
+      action ? 4500 : 2800,
+    );
   }, []);
 
   return (
@@ -37,6 +49,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           >
             <span aria-hidden>{t.type === 'success' ? '✓' : '!'}</span>
             <span>{t.message}</span>
+            {t.action && (
+              <button
+                onClick={() => {
+                  t.action?.onClick();
+                  setToasts((x) => x.filter((y) => y.id !== t.id));
+                }}
+                className="ml-2 rounded-lg bg-white/20 px-2.5 py-1 text-xs font-semibold hover:bg-white/30"
+              >
+                {t.action.label}
+              </button>
+            )}
           </div>
         ))}
       </div>

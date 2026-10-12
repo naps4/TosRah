@@ -7,9 +7,9 @@ import { Link } from 'react-router';
 
 export function Header() {
   const { user, logout } = useAuth();
-  const { count } = useCart();
+  const { count, cartOpen, openCart, closeCart } = useCart();
   const [modal, setModal] = useState<'login' | 'register' | null>(null);
-  const [cartOpen, setCartOpen] = useState(false);
+  
 
   return (
     <header className="sticky top-0 z-10 border-b border-cream-dark bg-cream/90 backdrop-blur">
@@ -21,7 +21,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           {user && (
             <button
-              onClick={() => setCartOpen(true)}
+              onClick={openCart}
               aria-label="Keranjang"
               className="relative rounded-full p-2.5 text-leaf-700 hover:bg-leaf-50"
             >
@@ -85,7 +85,7 @@ export function Header() {
       </div>
 
       {modal && <AuthModal initialMode={modal} onClose={() => setModal(null)} />}
-      {cartOpen && <CartDrawer onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartDrawer onClose={closeCart} />}
     </header>
   );
 }

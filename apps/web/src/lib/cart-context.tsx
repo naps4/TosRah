@@ -14,6 +14,9 @@ type CartState = {
   cart: Cart | null;
   count: number;
   loading: boolean;
+  cartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
   addItem: (productId: string, quantity: number) => Promise<void>;
   updateItem: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
@@ -26,6 +29,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const toast = useToast();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   async function refresh() {
     if (!user) {
@@ -54,7 +58,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
     setCart(data);
     const name = data.items.find((i) => i.product.id === productId)?.product.name;
-    toast(name ? `${name} ditambahkan ke keranjang` : 'Ditambahkan ke keranjang');
+    toast(
+      name ? `${name} ditambahkan ke keranjang` : 'Ditambahkan ke keranjang',
+      'success',
+      { label: 'Lihat keranjang', onClick: () => setCartOpen(true) },
+    );
   }
 
   async function updateItem(itemId: string, quantity: number) {
@@ -76,7 +84,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, count, loading, addItem, updateItem, removeItem }}
+      value={{
+        cart,
+        count,
+        loading,
+        addItem,
+        updateItem,
+        removeItem,
+        cartOpen,
+        openCart: () => setCartOpen(true),
+        closeCart: () => setCartOpen(false),
+      }}
     >
       {children}
     </CartContext.Provider>

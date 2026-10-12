@@ -59,10 +59,10 @@ export class ListProductsQueryDto {
   @IsOptional()
   @IsString()
   category?: string; // slug kategori
-
+  
   @IsOptional()
-  @IsIn(['newest', 'price_asc', 'price_desc'])
-  sort?: 'newest' | 'price_asc' | 'price_desc';
+  @IsIn(['newest', 'best_selling', 'price_asc', 'price_desc'])
+  sort?: 'newest' | 'best_selling' | 'price_asc' | 'price_desc';
 
   @IsOptional()
   @Type(() => Number)

@@ -8,6 +8,7 @@ export type Product = {
   price: number;
   unit: string;
   stock: number;
+  soldCount: number;
   imageUrl: string | null;
   store: { id: string; name: string; slug: string; city: string };
   category: Category;
