@@ -44,7 +44,7 @@ export function AuthModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6"
+        className="max-h-[85dvh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6"
       > 
         <h2 className="font-display text-2xl font-semibold text-leaf-700">
           {mode === 'login' ? 'Masuk ke Tosrah' : 'Daftar akun baru'}

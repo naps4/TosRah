@@ -50,7 +50,7 @@ export function CartDrawer({ onClose }: { onClose: () => void }) {
                             ? updateItem(item.id, item.quantity - 1)
                             : removeItem(item.id)
                         }
-                        className="px-2.5 py-1 text-ink-soft hover:text-ink"
+                        className="flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
                       >
                         −
                       </button>
@@ -62,14 +62,14 @@ export function CartDrawer({ onClose }: { onClose: () => void }) {
                           item.quantity < item.product.stock &&
                           updateItem(item.id, item.quantity + 1)
                         }
-                        className="px-2.5 py-1 text-ink-soft hover:text-ink"
+                        className="flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
                       >
                         +
                       </button>
                     </div>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-xs text-chili hover:underline"
+                      className="px-1 py-2 text-xs text-chili hover:underline"
                     >
                       Hapus
                     </button>
@@ -81,7 +81,7 @@ export function CartDrawer({ onClose }: { onClose: () => void }) {
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-cream-dark p-4">
+          <div className="border-t border-cream-dark p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex justify-between text-sm">
               <span className="text-ink-soft">Total</span>
               <span className="font-semibold">{formatRupiah(total)}</span>

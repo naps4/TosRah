@@ -77,11 +77,11 @@ export function HomePage() {
 
   return (
     <>
-      <section className="mt-6 rounded-3xl bg-leaf-700 px-6 py-10 text-white sm:px-12 sm:py-14">
+      <section className="mt-6 rounded-3xl bg-leaf-700 px-5 py-8 text-white sm:px-12 sm:py-14">
         <p className="text-sm font-semibold uppercase tracking-widest text-grain-300">
           Belanja kebutuhan dapur
         </p>
-        <h1 className="mt-2 max-w-2xl font-display text-4xl font-semibold leading-tight sm:text-5xl">
+        <h1 className="mt-2 max-w-2xl font-display text-3xl font-semibold leading-tight sm:text-4xl md:text-5xl">
           Sembako lengkap dari{' '}
           <span className="underline decoration-grain-400 decoration-4 underline-offset-4">
             toko-toko terpercaya
@@ -110,7 +110,7 @@ export function HomePage() {
         ))}
       </section>
 
-      <div className="mt-8 flex flex-wrap gap-2">
+      <div className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden">
         <Chip active={category === null} onClick={() => update({ kategori: null })}>
           Semua
         </Chip>
@@ -126,14 +126,14 @@ export function HomePage() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-cream-dark bg-white p-4">
-        <label className="text-xs text-ink-soft">
+        <label className="w-full text-xs text-ink-soft sm:w-auto">
           Urutkan
           <select
             value={sort}
             onChange={(e) =>
               update({ urut: e.target.value === 'newest' ? null : e.target.value })
             }
-            className="mt-1 block rounded-xl border border-cream-dark bg-white px-3 py-2 text-sm text-ink"
+            className="mt-1 block w-full rounded-xl border border-cream-dark bg-white px-3 py-2 text-sm text-ink sm:w-auto"
           >
             {sortOptions.map((o) => (
               <option key={o.value} value={o.value}>
@@ -143,7 +143,7 @@ export function HomePage() {
           </select>
         </label>
 
-        <form onSubmit={applyPrice} className="flex flex-wrap items-end gap-2">
+        <form onSubmit={applyPrice} className="flex w-full items-end gap-2 sm:w-auto">
           <label className="text-xs text-ink-soft">
             Harga min
             <input
@@ -272,7 +272,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+      className={`shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition ${
         active
           ? 'bg-leaf-600 text-white'
           : 'border border-cream-dark bg-white text-ink-soft hover:border-leaf-300'

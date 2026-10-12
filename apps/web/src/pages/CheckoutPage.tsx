@@ -197,11 +197,24 @@ export function CheckoutPage() {
         <button
           onClick={pay}
           disabled={!addressId || submitting}
-          className="mt-4 w-full rounded-full bg-leaf-600 py-3 text-sm font-semibold text-white hover:bg-leaf-700 disabled:opacity-50"
+          className="mt-4 hidden w-full rounded-full bg-leaf-600 py-3 text-sm font-semibold text-white hover:bg-leaf-700 disabled:opacity-50 md:block"
         >
           {submitting ? 'Memproses...' : 'Bayar sekarang'}
         </button>
       </aside>
+            <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-cream-dark bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
+        <div>
+          <p className="text-xs text-ink-soft">Total</p>
+          <p className="font-semibold">{formatRupiah(total)}</p>
+        </div>
+        <button
+          onClick={pay}
+          disabled={!addressId || submitting}
+          className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-semibold text-white hover:bg-leaf-700 disabled:opacity-50"
+        >
+          {submitting ? 'Memproses...' : 'Bayar sekarang'}
+        </button>
+      </div>
     </div>
   );
 }

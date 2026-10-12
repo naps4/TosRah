@@ -7,6 +7,8 @@ import { useCart } from '../lib/cart-context';
 import { formatRupiah } from '../lib/format';
 import type { Product } from '../lib/types';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ProductReviews } from '../components/ProductReviews';
+import { Stars } from '../components/Stars';
 
 export function ProductDetailPage() {
   const { slug } = useParams();
@@ -70,12 +72,12 @@ export function ProductDetailPage() {
     );
   }
 
-  const soldOut = product.stock === 0;
+   const soldOut = product.stock === 0;
   const busy = status === 'adding';
 
   return (
-    <div className="py-8">
-            <Breadcrumbs
+    <div className="py-8 pb-28 sm:pb-8">
+      <Breadcrumbs
         items={[
           { label: 'Beranda', to: '/' },
           {
@@ -86,7 +88,7 @@ export function ProductDetailPage() {
         ]}
       />
 
-      <div className="mt-4 grid grid-cols-1 gap-10 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-10">
         <div className="aspect-square overflow-hidden rounded-2xl bg-leaf-50">
           {product.imageUrl ? (
             <img
@@ -105,15 +107,29 @@ export function ProductDetailPage() {
           <span className="rounded-full bg-leaf-50 px-3 py-1 text-xs font-medium text-leaf-700">
             {product.category.name}
           </span>
-          <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
+          <h1 className="mt-3 font-display text-2xl font-semibold leading-tight sm:text-3xl">
             {product.name}
           </h1>
+
+          {product.ratingCount > 0 && (
+            <a
+              href="#ulasan"
+              className="mt-2 flex items-center gap-2 text-sm text-ink-soft"
+            >
+              <Stars value={product.ratingAvg} className="text-base" />
+              <span className="font-medium text-ink">
+                {product.ratingAvg.toFixed(1)}
+              </span>
+              <span>({product.ratingCount} ulasan)</span>
+            </a>
+          )}
+
           <p className="mt-1 text-sm text-ink-soft">
             Dijual oleh <span className="font-medium">{product.store.name}</span> ·{' '}
             {product.store.city}
           </p>
 
-          <p className="mt-4 text-3xl font-semibold text-leaf-700">
+          <p className="mt-4 text-2xl font-semibold text-leaf-700 sm:text-3xl">
             {formatRupiah(product.price)}{' '}
             <span className="text-sm font-normal text-ink-soft">/ {product.unit}</span>
           </p>
@@ -136,12 +152,13 @@ export function ProductDetailPage() {
             </p>
           )}
 
-          <div className="mt-6 flex items-center gap-3">
+          <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t border-cream-dark bg-white px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:z-auto sm:mt-6 sm:border-0 sm:bg-transparent sm:p-0">
             <div className="flex items-center rounded-full border border-cream-dark">
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
                 disabled={soldOut || busy}
-                className="px-3 py-2 text-lg text-ink-soft hover:text-ink disabled:opacity-40"
+                aria-label="Kurangi jumlah"
+                className="flex h-11 w-11 items-center justify-center text-lg text-ink-soft hover:text-ink disabled:opacity-40"
               >
                 −
               </button>
@@ -149,7 +166,8 @@ export function ProductDetailPage() {
               <button
                 onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
                 disabled={soldOut || busy || qty >= product.stock}
-                className="px-3 py-2 text-lg text-ink-soft hover:text-ink disabled:opacity-40"
+                aria-label="Tambah jumlah"
+                className="flex h-11 w-11 items-center justify-center text-lg text-ink-soft hover:text-ink disabled:opacity-40"
               >
                 +
               </button>
@@ -173,6 +191,12 @@ export function ProductDetailPage() {
           {error && <p className="mt-3 text-sm text-chili">{error}</p>}
         </div>
       </div>
+
+      <ProductReviews
+        slug={product.slug}
+        ratingAvg={product.ratingAvg}
+        ratingCount={product.ratingCount}
+      />
     </div>
   );
 }

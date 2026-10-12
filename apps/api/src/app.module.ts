@@ -11,6 +11,8 @@ import { CartModule } from './cart/cart.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
+import { ReviewsModule } from './reviews/reviews.module';
+
 
 @Module({
   imports: [ConfigModule.forRoot({isGlobal:true}), 
@@ -23,6 +25,7 @@ import { PaymentsModule } from './payments/payments.module';
     AddressesModule,
     OrdersModule,
     PaymentsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

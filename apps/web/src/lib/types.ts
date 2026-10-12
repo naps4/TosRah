@@ -9,6 +9,8 @@ export type Product = {
   unit: string;
   stock: number;
   soldCount: number;
+  ratingAvg: number;
+  ratingCount: number;
   imageUrl: string | null;
   store: { id: string; name: string; slug: string; city: string };
   category: Category;
@@ -63,4 +65,23 @@ export type Order = {
     store: { id: string; name: string };
     items: { id: string; productName: string; price: number; quantity: number }[];
   }[];
+};
+
+export type Review = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  userName: string;
+};
+
+export type ReviewList = {
+  items: Review[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+  distribution: { star: number; count: number }[];
+};
+
+export type MyReview = {
+  canReview: boolean;
+  review: { id: string; rating: number; comment: string | null } | null;
 };

@@ -98,6 +98,8 @@ model Product {
   imageUrl    String?
   isActive    Boolean  @default(true)
   soldCount   Int      @default(0)
+  ratingAvg   Float    @default(0)
+  ratingCount Int      @default(0)
   createdAt   DateTime @default(now())
 
   store      Store       @relation(fields: [storeId], references: [id])
