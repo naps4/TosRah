@@ -13,6 +13,7 @@ import { CartProvider } from './lib/cart-context.tsx';
 import { CheckoutPage } from './pages/CheckoutPage.tsx';
 import { OrderDetailPage } from './pages/OrderDetailPage.tsx';
 import { OrdersPage } from './pages/OrdersPage.tsx';
+import { ToastProvider } from './lib/toast-context.tsx';
 
 const queryClient = new QueryClient();
 
@@ -34,9 +35,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <CartProvider>
-          <RouterProvider router={router} />
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <RouterProvider router={router} />
+          </CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

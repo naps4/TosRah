@@ -8,6 +8,7 @@ import {
 import { api } from './api';
 import { useAuth } from './auth-context';
 import type { Cart } from './types';
+import { useToast } from './toast-context';
 
 type CartState = {
   cart: Cart | null;
@@ -22,6 +23,7 @@ const CartContext = createContext<CartState | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const toast = useToast();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +53,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ productId, quantity }),
     });
     setCart(data);
+    const name = data.items.find((i) => i.product.id === productId)?.product.name;
+    toast(name ? `${name} ditambahkan ke keranjang` : 'Ditambahkan ke keranjang');
   }
 
   async function updateItem(itemId: string, quantity: number) {

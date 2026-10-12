@@ -11,6 +11,7 @@ import {
   MaxLength,
   Min,
   MinLength,
+  IsIn,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -58,6 +59,22 @@ export class ListProductsQueryDto {
   @IsOptional()
   @IsString()
   category?: string; // slug kategori
+
+  @IsOptional()
+  @IsIn(['newest', 'price_asc', 'price_desc'])
+  sort?: 'newest' | 'price_asc' | 'price_desc';
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  minPrice?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  maxPrice?: number;
 
   @IsOptional()
   @Type(() => Number)

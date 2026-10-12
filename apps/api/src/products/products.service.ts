@@ -26,20 +26,34 @@ export class ProductsService {
   // ===== katalog publik =====
 
   async list(query: ListProductsQueryDto) {
-    const { q, category, page = 1, limit = 12 } = query;
+        const { q, category, sort, minPrice, maxPrice, page = 1, limit = 12 } = query;
 
     const where: Prisma.ProductWhereInput = {
       isActive: true,
       store: { status: 'ACTIVE' },
       ...(q ? { name: { contains: q, mode: 'insensitive' } } : {}),
       ...(category ? { category: { slug: category } } : {}),
+      ...(minPrice !== undefined || maxPrice !== undefined
+        ? {
+            price: {
+              ...(minPrice !== undefined ? { gte: minPrice } : {}),
+              ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
+            },
+          }
+        : {}),
     };
+    const orderBy: Prisma.ProductOrderByWithRelationInput =
+      sort === 'price_asc'
+        ? { price: 'asc' }
+        : sort === 'price_desc'
+          ? { price: 'desc' }
+          : { createdAt: 'desc' };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
         where,
         include: productInclude,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [orderBy, { id: 'asc' }],
         skip: (page - 1) * limit,
         take: limit,
       }),

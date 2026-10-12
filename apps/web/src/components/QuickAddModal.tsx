@@ -23,7 +23,7 @@ export function QuickAddModal({
     try {
       await addItem(product.id, qty);
       setDone(true);
-      setTimeout(onClose, 900); // tutup sendiri setelah sukses
+      onClose(); // konfirmasinya sudah lewat toast dari cart-context
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Gagal menambah ke keranjang');
     } finally {

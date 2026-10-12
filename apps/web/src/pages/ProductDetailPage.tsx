@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth-context';
 import { useCart } from '../lib/cart-context';
 import { formatRupiah } from '../lib/format';
 import type { Product } from '../lib/types';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export function ProductDetailPage() {
   const { slug } = useParams();
@@ -74,9 +75,16 @@ export function ProductDetailPage() {
 
   return (
     <div className="py-8">
-      <Link to="/" className="text-sm text-leaf-700 hover:underline">
-        &larr; Kembali
-      </Link>
+            <Breadcrumbs
+        items={[
+          { label: 'Beranda', to: '/' },
+          {
+            label: product.category.name,
+            to: `/?kategori=${product.category.slug}`,
+          },
+          { label: product.name },
+        ]}
+      />
 
       <div className="mt-4 grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div className="aspect-square overflow-hidden rounded-2xl bg-leaf-50">
@@ -110,8 +118,16 @@ export function ProductDetailPage() {
             <span className="text-sm font-normal text-ink-soft">/ {product.unit}</span>
           </p>
 
-          <p className="mt-1 text-sm text-ink-soft">
-            {soldOut ? 'Stok habis' : `Stok tersedia: ${product.stock}`}
+          <p
+            className={`mt-1 text-sm font-medium ${
+              product.stock <= 5 ? 'text-chili' : 'text-leaf-700'
+            }`}
+          >
+            {soldOut
+              ? 'Stok habis'
+              : product.stock <= 5
+                ? `Stok tinggal ${product.stock}`
+                : `Stok tersedia: ${product.stock}`}
           </p>
 
           {product.description && (
